@@ -16,10 +16,67 @@
         <result column="update_time" property="updateTime" />
         <result column="operator" property="operator" />
     </resultMap>
-
+    <resultMap id="UserPermTreeResultMap" type="com.swpu.userserver.user.vo.UserPermTree">
+        <id column="id" property="id"/>
+        <result column="perm_name" property="permName"/>
+        <result column="perm_type" property="permType"/>
+        <result column="perm_key" property="permKey"/>
+        <result column="perm_url" property="permUrl"/>
+        <collection property="children" column="{id=id}" ofType="com.swpu.userserver.user.vo.UserPermTree" select="selectChildPermTree">
+            <id column="id" property="id"/>
+            <result column="perm_name" property="permName"/>
+            <result column="perm_type" property="permType"/>
+            <result column="perm_key" property="permKey"/>
+            <result column="perm_url" property="permUrl"/>
+        </collection>
+    </resultMap>
     <!-- 通用查询结果列 -->
     <select id="Base_Column_List" resultMap="BaseResultMap">
         select id, username, password, sex, age, address, img_url, create_time, create_by, update_time, operator from user
     </select>
-
+    <select id="getPermissions" resultType="com.swpu.userserver.user.entity.Permission">
+        SELECT
+            p.*
+        FROM
+            user u
+                INNER JOIN user_role ur ON u.id = ur.user_id
+                INNER JOIN role r ON ur.role_id = r.id
+                INNER JOIN role_perm rp ON r.id = rp.role_id
+                INNER JOIN permission p ON rp.perm_id = p.id
+        WHERE
+            u.id = #{userId}
+    </select>
+    <!--根据userId获取菜单栏主查询-->
+    <select id="selectUserPermTreeByUserId" resultMap="UserPermTreeResultMap">
+        SELECT
+            p.id,
+            p.perm_name,
+            p.perm_type,
+            p.perm_key,
+            p.perm_url
+        FROM
+            user u
+                INNER JOIN user_role ur ON u.id = ur.user_id
+                INNER JOIN role r ON ur.role_id = r.id
+                INNER JOIN role_perm rp ON rp.role_id = r.id
+                INNER JOIN permission p ON rp.perm_id = p.id
+        WHERE
+            p.perm_type = 1
+          <if test="userId!=null">
+              AND u.id =#{userId}
+          </if>
+    </select>
+    <select id="selectChildPermTree" resultMap="UserPermTreeResultMap">
+        SELECT
+            id,
+            perm_name,
+            perm_type,
+            perm_key,
+            perm_url
+        FROM
+            permission
+        WHERE
+            perm_type = 2
+          AND  parent_id=#{id}
+    </select>
 </mapper>
