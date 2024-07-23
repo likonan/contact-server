@@ -67,6 +67,7 @@ public class User implements Serializable {
 
     /**
      * 创建时间
+     * 格式：YYYY-MM-DDTHH:MM:SS
      */
     @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;

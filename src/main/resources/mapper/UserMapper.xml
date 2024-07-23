@@ -79,4 +79,18 @@
             perm_type = 2
           AND  parent_id=#{id}
     </select>
+
+    <select id="selectPermListByUserId" resultType="java.lang.String">
+        SELECT
+            p.perm_key
+        FROM
+            USER u
+                INNER JOIN user_role ur ON u.id = ur.user_id
+                INNER JOIN role r ON ur.role_id = r.id
+                INNER JOIN role_perm rp ON r.id = rp.role_id
+                INNER JOIN permission p ON p.id = rp.perm_id
+        WHERE
+            p.perm_type =3
+        AND u.id=#{userId}
+    </select>
 </mapper>

@@ -19,5 +19,8 @@ import java.util.Map;
 public interface UserMapper extends BaseMapper<User> {
 
     List<Permission> getPermissions(Integer userId);
+
     List<UserPermTree> selectUserPermTreeByUserId(Map<String, Object> param);
+
+    List<String> selectPermListByUserId(Map<String, Object> param);
 }
